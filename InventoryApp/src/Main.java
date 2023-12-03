@@ -1,11 +1,17 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
 
 class Product {
     private String productID;
@@ -13,6 +19,9 @@ class Product {
     private double costOfSale;
     private double costOfPurchase;
     private int quantity;
+    public String getIdentifier() {
+        return productID;
+    }
 
     public Product(String productID, String name, double costOfSale, double costOfPurchase, int quantity) {
         this.productID = productID;
@@ -81,16 +90,20 @@ public class Main {
             e.printStackTrace();
         }
     }
-
+    
+    
+    
     public static void main(String[] args) {
     	logger.info("Application started.");
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Product> inventory = new ArrayList<>();
+        ArrayList<Product> inventory = new ArrayList<>();       
+        loadInventoryFromFile(inventory);
 
         while (true) {
             System.out.println("1. Add Product");
             System.out.println("2. View Inventory");
-            System.out.println("3. Exit");
+            System.out.println("3. Delete from Inventory");
+            System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
 
@@ -102,13 +115,42 @@ public class Main {
                     viewInventory(inventory);
                     break;
                 case 3:
-                	logger.info("Exiting program. Goodbye!");
-                    System.out.println("Exiting program. Goodbye!");
+                    deleteProduct(inventory, scanner);
+                    break;
+                case 4:  
+                	saveInventoryToFile(inventory);
+                    logger.info("Exiting program. Goodbye!");
                     System.exit(0);
                 default:
-                	logger.severe("Invalid choice. Please enter a valid option.");
-                    System.out.println("Invalid choice. Please enter a valid option.");
+                    logger.severe("Invalid choice. Please enter a valid option.");
             }
+        }
+    }
+    
+    private static void loadInventoryFromFile(ArrayList<Product> inventory) {
+        try (Scanner scanner = new Scanner(new File("inventory.txt"))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(",");
+                if (parts.length == 5) {
+                    String productID = parts[0];
+                    String name = parts[1];
+                    double costOfSale = Double.parseDouble(parts[2]);
+                    double costOfPurchase = Double.parseDouble(parts[3]);
+                    int quantity = Integer.parseInt(parts[4]);
+
+                    Product product = new Product(productID, name, costOfSale, costOfPurchase, quantity);
+                    inventory.add(product);
+                } else {
+                    System.out.println("Invalid data in inventory file: " + line);
+                }
+            }
+            System.out.println("Inventory loaded from file.");
+        } catch (FileNotFoundException e) {
+            System.out.println("No previous inventory found.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to load inventory from file.");
         }
     }
 
@@ -180,6 +222,7 @@ public class Main {
     }
 
     private static void viewInventory(ArrayList<Product> inventory) {
+    	
     	logger.info("Viewing inventory.");
         if (inventory.isEmpty()) {
         	logger.info("Inventory is empty.");
@@ -189,6 +232,40 @@ public class Main {
                 System.out.println(product);
                 System.out.println("------------------------");
             }
+            
+        }
+    }
+    
+    private static void deleteProduct(ArrayList<Product> inventory, Scanner scanner) {
+        System.out.print("Enter the Product ID to delete: ");
+        String productIDToDelete = scanner.next();
+
+        // Find the product in the inventory
+        for (Product product : inventory) {
+            if (product.getIdentifier().equals(productIDToDelete)) {
+            	DatabaseConnector.deleteProduct(productIDToDelete);
+                inventory.remove(product);
+                System.out.println("Product deleted successfully.");
+                return;
+            }
+        }
+
+        System.out.println("Product with ID " + productIDToDelete + " not found in inventory.");
+    }
+    
+    private static void saveInventoryToFile(ArrayList<Product> inventory) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("inventory.txt"))) {
+            for (Product product : inventory) {
+                writer.println(product.getProductID() + "," +
+                               product.getName() + "," +
+                               product.getCostOfSale() + "," +
+                               product.getCostOfPurchase() + "," +
+                               product.getQuantity());
+            }
+            System.out.println("Inventory saved to file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to save inventory to file.");
         }
     }
 }

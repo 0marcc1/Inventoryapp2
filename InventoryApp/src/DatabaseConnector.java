@@ -1,7 +1,10 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseConnector {
 
@@ -27,6 +30,27 @@ public class DatabaseConnector {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+    
+    
+    public static void deleteProduct(String productID) {
+        try (Connection connection = getConnection()) {
+            String query = "DELETE FROM products WHERE productID = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, productID);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("Product deleted successfully from the database.");
+                } else {
+                    System.out.println("Product with ID " + productID + " not found in the database.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error deleting product from the database.");
         }
     }
 }
