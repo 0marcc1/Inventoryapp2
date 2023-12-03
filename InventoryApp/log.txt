@@ -1,67 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE log SYSTEM "logger.dtd">
-<log>
-<record>
-  <date>2023-11-26T23:15:07.641646Z</date>
-  <millis>1701040507641</millis>
-  <nanos>646000</nanos>
-  <sequence>0</sequence>
-  <logger>Logger</logger>
-  <level>INFO</level>
-  <class>Logger</class>
-  <method>logInfo</method>
-  <thread>1</thread>
-  <message>Application started.</message>
-</record>
-<record>
-  <date>2023-11-26T23:15:09.965342700Z</date>
-  <millis>1701040509965</millis>
-  <nanos>342700</nanos>
-  <sequence>1</sequence>
-  <logger>Logger</logger>
-  <level>INFO</level>
-  <class>Logger</class>
-  <method>logInfo</method>
-  <thread>1</thread>
-  <message>Viewing inventory.</message>
-</record>
-<record>
-  <date>2023-11-26T23:15:09.973349800Z</date>
-  <millis>1701040509973</millis>
-  <nanos>349800</nanos>
-  <sequence>2</sequence>
-  <logger>Logger</logger>
-  <level>INFO</level>
-  <class>Logger</class>
-  <method>logInfo</method>
-  <thread>1</thread>
-  <message>Inventory is empty.</message>
-</record>
-<record>
-  <date>2023-11-26T23:15:15.460212100Z</date>
-  <millis>1701040515460</millis>
-  <nanos>212100</nanos>
-  <sequence>3</sequence>
-  <logger>Logger</logger>
-  <level>INFO</level>
-  <class>Logger</class>
-  <method>logInfo</method>
-  <thread>1</thread>
-  <message>Adding product process started.</message>
-</record>
-<record>
-  <date>2023-11-26T23:15:32.596283400Z</date>
-  <millis>1701040532596</millis>
-  <nanos>283400</nanos>
-  <sequence>4</sequence>
-  <logger>Logger</logger>
-  <level>INFO</level>
-  <class>Logger</class>
-  <method>logInfo</method>
-  <thread>1</thread>
-  <message>Product added successfully: Product ID: 214202
-Name: club
-Cost of Sale: $2555.0
-Cost of Purchase: $121.0
-Quantity: 124</message>
-</record>
+Dec 02, 2023 7:11:11 PM logger logInfo
+INFO: Adding product process started.
+Dec 02, 2023 7:11:22 PM logger logInfo
+INFO: Adding product process started.
+Dec 02, 2023 7:11:23 PM logger logInfo
+INFO: Adding product process started.
+Dec 02, 2023 7:11:23 PM logger logInfo
+INFO: Adding product process started.
+Dec 02, 2023 7:11:24 PM logger logInfo
+INFO: Adding product process started.

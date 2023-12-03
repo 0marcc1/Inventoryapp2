@@ -57,11 +57,13 @@ class Product {
 
     @Override
     public String toString() {
-        return "Product ID: " + productID +
-                "\nName: " + name +
-                "\nCost of Sale: $" + costOfSale +
-                "\nCost of Purchase: $" + costOfPurchase +
-                "\nQuantity: " + quantity;
+        return "Product{" +
+                "productID=" + productID +
+                ", name='" + name + '\'' +
+                ", costOfSale=" + costOfSale +
+                ", costOfPurchase=" + costOfPurchase +
+                ", quantity=" + quantity +
+                '}';
     }
 }
 
@@ -91,7 +93,7 @@ public class Main {
         }
     }
     
-    
+    private static List<Product> inventory = new ArrayList<>();
     
     public static void main(String[] args) {
     	logger.info("Application started.");
@@ -103,9 +105,11 @@ public class Main {
             System.out.println("1. Add Product");
             System.out.println("2. View Inventory");
             System.out.println("3. Delete from Inventory");
-            System.out.println("4. Exit");
+            System.out.println("4. Search by Name");
+            System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -117,7 +121,12 @@ public class Main {
                 case 3:
                     deleteProduct(inventory, scanner);
                     break;
-                case 4:  
+                case 4:
+                    System.out.print("Enter product name to search: ");
+                    String searchName = scanner.nextLine();
+                    searchByName(searchName, inventory);
+                    break;
+                case 5:  
                 	saveInventoryToFile(inventory);
                     logger.info("Exiting program. Goodbye!");
                     System.exit(0);
@@ -236,6 +245,23 @@ public class Main {
         }
     }
     
+    private static void searchByName(String name, List<Product> inventory) {
+        // Search for the product by name and display details
+        boolean found = false;
+
+        for (Product product : inventory) {
+            if (product.getName().equalsIgnoreCase(name)) {
+                System.out.println("Product found:");
+                System.out.println(product);
+                found = true;
+                break; // Stop searching once a match is found
+            }
+        }
+
+        if (!found) {
+            System.out.println("Product with name '" + name + "' not found in the inventory.");
+        }
+    }
     private static void deleteProduct(ArrayList<Product> inventory, Scanner scanner) {
         System.out.print("Enter the Product ID to delete: ");
         String productIDToDelete = scanner.next();
@@ -269,3 +295,5 @@ public class Main {
         }
     }
 }
+
+
