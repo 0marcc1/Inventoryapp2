@@ -11,6 +11,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 class Product {
@@ -19,6 +21,9 @@ class Product {
     private double costOfSale;
     private double costOfPurchase;
     private int quantity;
+    private int sales;
+    private String date_column;
+    private int sales_in_past_6_months;
     public String getIdentifier() {
         return productID;
     }
@@ -29,6 +34,9 @@ class Product {
         this.costOfSale = costOfSale;
         this.costOfPurchase = costOfPurchase;
         this.quantity = quantity;
+        this.sales = 0; 
+        this.date_column = ""; 
+        this.sales_in_past_6_months = 0;
     }
 
     public String getProductID() {
@@ -54,7 +62,30 @@ class Product {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+    
+    public int getSales() {
+        return sales;
+    }
 
+    public void setSales(int sales) {
+        this.sales = sales;
+    }
+
+    public String getDateColumn() {
+        return date_column;
+    }
+
+    public void setDateColumn(String dateColumn) {
+        this.date_column = dateColumn;
+    }
+
+    public int getSalesInPast6Months() {
+        return sales_in_past_6_months;
+    }
+
+    public void setSalesInPast6Months(int salesInPast6Months) {
+        this.sales_in_past_6_months = salesInPast6Months;
+    }
     @Override
     public String toString() {
         return "Product{" +
@@ -100,13 +131,15 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Product> inventory = new ArrayList<>();       
         loadInventoryFromFile(inventory);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> saveInventoryToFile(inventory)));
 
         while (true) {
             System.out.println("1. Add Product");
             System.out.println("2. View Inventory");
-            System.out.println("3. Delete from Inventory");
-            System.out.println("4. Search by Name");
-            System.out.println("5. Exit");
+            System.out.println("3. Sell Item");
+            System.out.println("4. Delete from Inventory");
+            System.out.println("5. Search by Name");
+            System.out.println("6. Exit");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -119,14 +152,17 @@ public class Main {
                     viewInventory(inventory);
                     break;
                 case 3:
-                    deleteProduct(inventory, scanner);
+                    sellItem(inventory, scanner);
                     break;
                 case 4:
+                    deleteProduct(inventory, scanner);
+                    break;
+                case 5:
                     System.out.print("Enter product name to search: ");
                     String searchName = scanner.nextLine();
                     searchByName(searchName, inventory);
                     break;
-                case 5:  
+                case 6:  
                 	saveInventoryToFile(inventory);
                     logger.info("Exiting program. Goodbye!");
                     System.exit(0);
@@ -245,6 +281,41 @@ public class Main {
         }
     }
     
+    private static void sellItem(List<Product> inventory, Scanner scanner) {
+        System.out.println("Inventory:");
+        for (Product product : inventory) {
+            System.out.println(product.getProductID() + ": " + product.getName() + " - Quantity: " + product.getQuantity());
+        }
+
+        System.out.print("Enter the Product ID to sell: ");
+        String productIDToSell = scanner.nextLine();
+
+        // Find the product in the inventory
+        for (Product product : inventory) {
+            if (product.getProductID().equalsIgnoreCase(productIDToSell)) {
+                System.out.print("Enter the quantity to sell: ");
+                int quantityToSell = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+
+                if (quantityToSell <= product.getQuantity()) {
+                    // Update sales-related columns in the product
+                    product.setSales(product.getSales() + quantityToSell);
+                    product.setDateColumn(DateUtils.getCurrentDate());
+                    product.setSalesInPast6Months(product.getSalesInPast6Months() + quantityToSell);
+                    DatabaseConnector.sellItem(product, quantityToSell);
+                    product.setQuantity(product.getQuantity() - quantityToSell);
+                    System.out.println("Item sold successfully!");
+                    
+                } else {
+                    System.out.println("Insufficient quantity in inventory.");
+                }
+
+                return;
+            }
+        }
+
+        System.out.println("Product with ID " + productIDToSell + " not found in inventory.");
+    }
     private static void searchByName(String name, List<Product> inventory) {
         // Search for the product by name and display details
         boolean found = false;

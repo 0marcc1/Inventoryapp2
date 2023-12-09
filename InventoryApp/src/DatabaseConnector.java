@@ -15,6 +15,33 @@ public class DatabaseConnector {
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
     }
+    
+    public static void sellItem(Product product, int quantitySold) {
+    	try (Connection connection = getConnection()) {
+            // Update sales-related columns in the database
+            String sqlUpdate = "UPDATE products SET sales = ?, date_column = ?, sales_in_past_6_months = ? WHERE productID = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlUpdate)) {
+                preparedStatement.setInt(1, product.getSales());
+                preparedStatement.setString(2, product.getDateColumn());
+                preparedStatement.setInt(3, product.getSalesInPast6Months());
+                preparedStatement.setString(4, product.getProductID());
+                preparedStatement.executeUpdate();
+            }
+
+            // Subtract the sold quantity from the database
+            String sqlSubtractQuantity = "UPDATE products SET quantity = quantity - ? WHERE productID = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlSubtractQuantity)) {
+                preparedStatement.setInt(1, quantitySold);
+                preparedStatement.setString(2, product.getProductID());
+                preparedStatement.executeUpdate();
+            }
+
+            // Commit the transaction
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void addProduct(Product product) {
         try (Connection connection = getConnection()) {
